@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { T } from '@threlte/core';
+	import { T, useTask } from '@threlte/core';
 	import { ContactShadows, Float, Grid, OrbitControls } from '@threlte/extras';
 	import { interactivity } from '@threlte/extras';
 	import { v4 as uuidv4 } from 'uuid';
@@ -164,7 +164,11 @@
 			position: [1, 0.75, 1.5],
 			rotation: [0, 0, 0],
 			scale: [1, 1, 1],
-			color: 'red',
+			color: //random color
+				'#' +
+				Math.random()
+					.toString(16)
+					.slice(2, 8),
 			id: uuidv4(),
 			step: 0
 		});
@@ -172,19 +176,15 @@
 	};
 
 	const moveEnemies = () => {
-		enemies = enemies
-			.map((enemy) => {
-				const nextStep = steps[enemy.step + 1];
-				if (nextStep) {
-					enemy.position = [nextStep[0], nextStep[1], nextStep[2]];
-					enemy.step = enemy.step + 1;
-				}
-				return enemy;
-			})
-			.filter((enemy) => {
-				return steps[enemy.step + 1];
-			});
-		enemies = enemies;
+		enemies = enemies.map((enemy) => {
+			if(enemy.step < steps.length) {
+				const step = steps[enemy.step];
+				enemy.position = [step[0], step[1], step[2]];
+				enemy.step++;
+			}
+			return enemy;
+		});
+		enemies = enemies.filter((enemy) => enemy.step < steps.length);
 	};
 
 	let walls: Wall[] = [
@@ -340,34 +340,32 @@
 		};
 	});
 
-	const gameLoop = (timestamp: number) => {
-		const progress = timestamp - lastRender;
-		lastRender = timestamp;
-		moveEnemiesPeriodically(progress);
-		spawnEnemyPeriodically(progress);
+
+	const gameLoop = () => {
+		if(performance.now() - lastSpawn > 250) {
+			spawnEnemy();
+			lastSpawn = performance.now();
+		}
+		if(performance.now() - lastMove > 10) {
+			moveEnemies();
+			lastMove = performance.now();
+		}
 		requestAnimationFrame(gameLoop);
 	};
 
-	const runPeriodicFunction = (fn: { (): void; (): void }, runEvery: number) => {
-		let counter = 0;
-		return function (deltaTime: number) {
-			counter += deltaTime;
-			if (counter >= runEvery) {
-				fn();
-				counter = 0;
-			}
-		};
-	};
-
-	const moveEnemiesPeriodically = runPeriodicFunction(moveEnemies, 100);
-	const spawnEnemyPeriodically = runPeriodicFunction(spawnEnemy, 1250);
-
-	let lastRender = performance.now();
-	requestAnimationFrame(gameLoop);
+	let lastSpawn = performance.now();
+	let lastMove = performance.now();
+	gameLoop();
 </script>
 
 <T.PerspectiveCamera makeDefault position={[-12, 20, 0]} fov={75}>
-	<OrbitControls enableZoom={false} enabled={false} enableDamping autoRotateSpeed={0.5} target.y={1.5} />
+	<OrbitControls
+		enableZoom={false}
+		enabled={false}
+		enableDamping
+		autoRotateSpeed={0.5}
+		target.y={1.5}
+	/>
 </T.PerspectiveCamera>
 
 <T.DirectionalLight intensity={1} position.x={5} position.y={10} />
