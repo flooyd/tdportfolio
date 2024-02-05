@@ -366,14 +366,12 @@
 	requestAnimationFrame(gameLoop);
 </script>
 
-<T.PerspectiveCamera makeDefault position={[-12, 15, 0]} fov={75}>
+<T.PerspectiveCamera makeDefault position={[-12, 20, 0]} fov={75}>
 	<OrbitControls enableZoom={false} enabled={false} enableDamping autoRotateSpeed={0.5} target.y={1.5} />
 </T.PerspectiveCamera>
 
-<T.DirectionalLight intensity={0.8} position.x={5} position.y={10} />
+<T.DirectionalLight intensity={1} position.x={5} position.y={10} />
 <T.AmbientLight intensity={1} />
-
-<ContactShadows scale={10} blur={2} far={2.5} opacity={0.5} />
 
 {#each walls as wall}
 	<T.Mesh position={[wall.position[0], wall.position[1], wall.position[2]]}>
