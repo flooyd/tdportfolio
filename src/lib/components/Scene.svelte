@@ -365,7 +365,7 @@
 </script>
 
 {#if ready}
-<T.PerspectiveCamera makeDefault position={[-12, 20, 0]} fov={75}>
+<T.PerspectiveCamera makeDefault position={[-12, 20, 0]} fov={90}>
 	<OrbitControls enabled={false} enableDamping autoRotateSpeed={0.5} target.y={1.5} />
 </T.PerspectiveCamera>
 

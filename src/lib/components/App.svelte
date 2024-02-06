@@ -50,15 +50,14 @@
 		<p class="projectName">Svelte App Editor</p>
 		<p class="projectDescription">
 			A simple app editor for svelte apps. It allows you to create and edit svelte apps in the
-			browser. Influenced by Unreal Engine Blueprint, this is my favorite and most ambitious
-			project. The backend is MongoDB with NestJS.
+			browser. It's made with SvelteKit and NestJS.
 		</p>
 		<img src="https://github.com/flooyd/things/raw/main/public/images/grid.png?raw=true" alt="screenshot of app">
 	</div>
 {/if}
 {#if project === 2}
 	<div class="project" transition:fly={{ duration: 300, x: -1000 }}>
-		<p class="projectName">2D Tower Defense Map Editor</p>
+		<p class="projectName">2D Map Editor</p>
 		<p class="projectDescription">
 			A 2D map editor for a tower defense game. It allows you to create and edit maps in the
 			browser. I made this while learning Solid.js.
@@ -141,16 +140,25 @@
 		left: 25.89px;
 	}
 
+	@media (max-width: 400px) {
+		.project img {
+			top: 339.89px;
+		}
+	}
+
 	.images {
 		position: absolute;
 		top: 120px;
 		width: 100%;
 		text-align: center;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		gap: 9.89px;
 	}
 
 	button {
-		font-size: 25.89px;
-		position: absolute;
+		font-size: 16px;
 		bottom: 16px;
 		padding: 6px;
 		width: fit-content;
@@ -160,11 +168,6 @@
 		outline: none;
 		border: 1px solid black;
 		border-radius: 5px;
-	}
-
-	button.projects {
-		width: 102px;
-		left: calc(50% - 51px);
 	}
 
 	.next {
