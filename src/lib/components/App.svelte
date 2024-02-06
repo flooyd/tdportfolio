@@ -16,12 +16,18 @@
 <div class="name">Floyd Jones</div>
 <div class="intro">Full Stack Developer</div>
 <div class="images">
+	{#if project > 0}
+	<button on:click={() => project--} class="prev">Previous</button>
+{/if}
 	<a target="__blank" href="https://github.com/flooyd">
 		<img src="github.png" alt="github" />
 	</a>
 	<a target="__blank" href="https://linkedin.com/in/flooyd">
 		<img src="linkedin.webp" alt="linkedin" />
 	</a>
+	{#if project < 3}
+<button on:click={() => project++} class="next">Next</button>
+{/if}
 </div>
 {#if project === 0}
 	{#if ready}
@@ -70,12 +76,7 @@
 		<img src="https://github.com/flooyd/dota2lfg/raw/master/readme%20images/dota2lfg.PNG" alt="screenshot of app">
 	</div>
 {/if}
-{#if project < 3}
-	<button on:click={() => project++} class="next">Next</button>
-{/if}
-{#if project > 0}
-	<button on:click={() => project--} class="prev">Previous</button>
-{/if}
+
 
 <style>
 	* {
@@ -123,6 +124,7 @@
 		position: absolute;
 		top: 249px;
 		left: 25.89px;
+		color: red;
 	}
 
 	img {
