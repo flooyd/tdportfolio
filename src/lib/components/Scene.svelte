@@ -1,9 +1,11 @@
 <script lang="ts">
+	import type { RigidBody as RapierRigidBody } from '@dimforge/rapier3d-compat';
 	import { T, useTask } from '@threlte/core';
-	import { ContactShadows, Float, Grid, OrbitControls } from '@threlte/extras';
+	import { OrbitControls } from '@threlte/extras';
 	import { interactivity } from '@threlte/extras';
 	import { v4 as uuidv4 } from 'uuid';
-	import { gsap } from 'gsap';
+	import { AutoColliders, Collider, Debug, RigidBody } from '@threlte/rapier';
+	import { onMount } from 'svelte';
 
 	interactivity();
 
@@ -23,7 +25,6 @@
 		id?: string | undefined;
 		step: number;
 	};
-
 	const startingPosition = [1, 0.75, 1.5];
 
 	let steps = [
@@ -160,25 +161,23 @@
 	let enemies: Enemy[] = [];
 
 	const spawnEnemy = () => {
-		enemies.push({
-			position: [1, 0.75, 1.5],
-			rotation: [0, 0, 0],
-			scale: [1, 1, 1],
-			color: //random color
-				'#' +
-				Math.random()
-					.toString(16)
-					.slice(2, 8),
-			id: uuidv4(),
-			step: 0
-		});
-		enemies = enemies;
+		enemies = [
+			...enemies,
+			{
+				position: [1, 0.75, 1.5],
+				rotation: [0, 0, 0],
+				scale: [1, 1, 1],
+				color: ['red', 'green', 'blue'][Math.floor(Math.random() * 3)],
+				id: uuidv4(),
+				step: 0,
+			}
+		];
 	};
 
 	const moveEnemies = () => {
 		enemies = enemies.map((enemy) => {
-			if(enemy.step < steps.length) {
-				const step = steps[enemy.step];
+			const step = steps[enemy.step];
+			if (step) {
 				enemy.position = [step[0], step[1], step[2]];
 				enemy.step++;
 			}
@@ -340,32 +339,34 @@
 		};
 	});
 
+	let lastSpawn = performance.now();
+	let spawnEvery = 350;
+	let lastMove = performance.now();
+	let moveEvery = 25;
+	let ready = false;
 
-	const gameLoop = () => {
-		if(performance.now() - lastSpawn > 250) {
+	useTask(() => {
+		if (lastSpawn + spawnEvery < performance.now()) {
 			spawnEnemy();
 			lastSpawn = performance.now();
 		}
-		if(performance.now() - lastMove > 10) {
+	});
+
+	useTask(() => {
+		if (lastMove + moveEvery < performance.now()) {
 			moveEnemies();
 			lastMove = performance.now();
 		}
-		requestAnimationFrame(gameLoop);
-	};
+	});
 
-	let lastSpawn = performance.now();
-	let lastMove = performance.now();
-	gameLoop();
+	onMount(() => {
+		ready = true;
+	});
 </script>
 
+{#if ready}
 <T.PerspectiveCamera makeDefault position={[-12, 20, 0]} fov={75}>
-	<OrbitControls
-		enableZoom={false}
-		enabled={false}
-		enableDamping
-		autoRotateSpeed={0.5}
-		target.y={1.5}
-	/>
+	<OrbitControls enabled={false} enableDamping autoRotateSpeed={0.5} target.y={1.5} />
 </T.PerspectiveCamera>
 
 <T.DirectionalLight intensity={1} position.x={5} position.y={10} />
@@ -383,9 +384,13 @@
 	<T.MeshStandardMaterial color={'#333'} />
 </T.Mesh>
 
-{#each enemies as enemy}
-	<T.Mesh class="enemy" position={[enemy.position[0], enemy.position[1], enemy.position[2]]}>
-		<T.BoxGeometry args={[enemy.scale[0], enemy.scale[1], enemy.scale[2]]} />
-		<T.MeshStandardMaterial color={enemy.color} />
-	</T.Mesh>
+{#each enemies as enemy (enemy.id)}
+	<T.Group scale={[1, 1, 1]} position={[enemy.position[0], enemy.position[1], enemy.position[2]]}>
+		<T.Mesh>
+			<T.BoxGeometry args={[1, 1, 1]} />
+			<T.MeshStandardMaterial color={enemy.color} />
+		</T.Mesh>
+	</T.Group>
 {/each}
+{/if}
+

@@ -2,7 +2,7 @@
   import App from '$lib/components/App.svelte'
 </script>
 
-<div>
+<div class="viewport">
   <App />
 </div>
 
@@ -15,5 +15,11 @@
     width: 100vw;
     height: 100vh;
     background: white;
+  }
+
+  .viewport {
+    position: relative;
+    width: 100vw;
+    height: 100vh;
   }
 </style>
